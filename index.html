@@ -1,0 +1,21 @@
+<h1>🚀 Hikaye Mühendisi Çalışıyor</h1>
+
+<select id="karakter">
+  <option>Mino</option>
+  <option>Miniş</option>
+  <option>Minik Prenses</option>
+</select>
+
+<br><br>
+
+<button onclick="baslat()">Başlat</button>
+
+<p id="hikaye"></p>
+
+<script>
+function baslat(){
+  let k = document.getElementById("karakter").value;
+  document.getElementById("hikaye").innerText =
+    k + " büyülü ormanda maceraya başladı...";
+}
+</script>
