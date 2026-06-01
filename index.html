@@ -1,21 +1,679 @@
-<h1>🚀 Hikaye Mühendisi Çalışıyor</h1>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hikaye Mühendisi 🌟</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #6DD5FA;
+    --sun: #FFD93D;
+    --grass: #6BCB77;
+    --coral: #FF6B6B;
+    --purple: #C77DFF;
+    --orange: #FF9F43;
+    --teal: #4ECDC4;
+    --pink: #FF6EB4;
+    --dark: #2C3E50;
+    --white: #FFFEF7;
+    --card-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  }
 
-<select id="karakter">
-  <option>Mino</option>
-  <option>Miniş</option>
-  <option>Minik Prenses</option>
-</select>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-<br><br>
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-<button onclick="baslat()">Başlat</button>
+  /* Animated background stars */
+  .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 3s infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
 
-<p id="hikaye"></p>
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    padding: 30px 20px 20px;
+    animation: slideDown 0.8s ease;
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .header h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 40px rgba(255,255,255,0.2);
+    letter-spacing: -1px;
+  }
+  .header h1 span { color: var(--sun); }
+  .header p {
+    color: rgba(255,255,255,0.85);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+
+  /* SCREEN MANAGEMENT */
+  .screen { display: none; animation: fadeIn 0.5s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* AGE SELECTION */
+  .age-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 30px 0;
+  }
+  .age-card {
+    background: white;
+    border-radius: 28px;
+    padding: 40px 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: var(--card-shadow);
+    border: 4px solid transparent;
+  }
+  .age-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: var(--purple);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .age-card .emoji { font-size: 4rem; display: block; margin-bottom: 15px; }
+  .age-card h2 { font-family: 'Baloo 2', cursive; font-size: 2rem; font-weight: 800; color: var(--dark); }
+  .age-card p { color: #888; font-size: 0.95rem; margin-top: 8px; font-weight: 600; }
+  .age-card.young { background: linear-gradient(135deg, #fff9e6, #fff3cc); }
+  .age-card.older { background: linear-gradient(135deg, #e6f3ff, #cce5ff); }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+    margin: 25px 0 15px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  }
+  .section-title span { font-size: 1.3rem; }
+
+  /* CHARACTER & OPTION CARDS */
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 14px;
+    margin: 10px 0 20px;
+  }
+  .option-card {
+    background: white;
+    border-radius: 20px;
+    padding: 18px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 3px solid transparent;
+    position: relative;
+  }
+  .option-card:hover { transform: translateY(-5px) scale(1.05); }
+  .option-card.selected {
+    border-color: var(--coral);
+    background: linear-gradient(135deg, #fff5f5, #ffe0e0);
+    transform: scale(1.08);
+    box-shadow: 0 8px 25px rgba(255,107,107,0.3);
+  }
+  .option-card.selected-2 {
+    border-color: var(--teal);
+    background: linear-gradient(135deg, #f0fffe, #d0f5f3);
+    transform: scale(1.08);
+    box-shadow: 0 8px 25px rgba(78,205,196,0.3);
+  }
+  .option-card .check {
+    position: absolute;
+    top: -8px; right: -8px;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    color: white;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s;
+  }
+  .option-card.selected .check { background: var(--coral); opacity: 1; transform: scale(1); }
+  .option-card.selected-2 .check { background: var(--teal); opacity: 1; transform: scale(1); }
+  .option-card .emoji { font-size: 2.8rem; display: block; margin-bottom: 8px; }
+  .option-card .label { font-size: 0.85rem; font-weight: 800; color: var(--dark); }
+  .option-card .sublabel { font-size: 0.75rem; color: #aaa; margin-top: 3px; }
+
+  /* CHARACTER SELECTION HELPER */
+  .char-helper {
+    background: rgba(255,255,255,0.15);
+    border-radius: 16px;
+    padding: 12px 20px;
+    margin-bottom: 15px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .char-slot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  .char-slot.slot1 { color: var(--coral); }
+  .char-slot.slot2 { color: var(--teal); }
+  .char-slot .dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+  }
+  .char-slot.slot1 .dot { background: var(--coral); }
+  .char-slot.slot2 .dot { background: var(--teal); }
+
+  /* THEME CARDS */
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+    margin: 10px 0 20px;
+  }
+  .theme-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 3px solid transparent;
+  }
+  .theme-card:hover { transform: translateY(-5px); }
+  .theme-card.selected {
+    border-color: var(--orange);
+    background: linear-gradient(135deg, #fff8f0, #ffe8cc);
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(255,159,67,0.3);
+  }
+  .theme-card .emoji { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+  .theme-card .label { font-size: 0.9rem; font-weight: 800; color: var(--dark); }
+  .theme-card .desc { font-size: 0.75rem; color: #999; margin-top: 4px; }
+
+  /* LOCATION CARDS */
+  .location-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin: 10px 0 20px;
+  }
+  @media (max-width: 600px) {
+    .location-grid { grid-template-columns: repeat(3, 1fr); }
+    .age-cards { grid-template-columns: 1fr; }
+  }
+  .location-card {
+    background: white;
+    border-radius: 18px;
+    padding: 16px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 3px solid transparent;
+  }
+  .location-card:hover { transform: translateY(-4px); }
+  .location-card.selected {
+    border-color: var(--grass);
+    background: linear-gradient(135deg, #f0fff4, #d0f5dc);
+    transform: scale(1.05);
+  }
+  .location-card .emoji { font-size: 2.2rem; display: block; margin-bottom: 6px; }
+  .location-card .label { font-size: 0.8rem; font-weight: 800; color: var(--dark); }
+
+  /* GENERATE BUTTON */
+  .btn-generate {
+    display: block;
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--sun), var(--orange));
+    color: white;
+    border: none;
+    border-radius: 24px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.5rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 30px rgba(255,159,67,0.4);
+    margin: 10px 0 30px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .btn-generate:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(255,159,67,0.5); }
+  .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* STORY SCREEN */
+  .story-bg {
+    border-radius: 32px;
+    padding: 30px;
+    margin: 20px 0;
+    min-height: 400px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .story-scene {
+    font-size: 5rem;
+    text-align: center;
+    margin-bottom: 20px;
+    animation: scenePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes scenePop {
+    from { transform: scale(0) rotate(-10deg); opacity: 0; }
+    to { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  .chars-display {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 25px;
+  }
+  .char-bubble {
+    text-align: center;
+    animation: charFloat 3s ease-in-out infinite;
+  }
+  .char-bubble:nth-child(2) { animation-delay: 1.5s; }
+  @keyframes charFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .char-bubble .char-emoji { font-size: 4rem; display: block; }
+  .char-bubble .char-name {
+    font-weight: 800;
+    font-size: 1rem;
+    margin-top: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    color: white;
+  }
+  .char-bubble:first-child .char-name { background: var(--coral); }
+  .char-bubble:last-child .char-name { background: var(--teal); }
+
+  /* DIALOG */
+  .dialog-container { margin: 10px 0; }
+  .dialog-line {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.5s ease;
+  }
+  .dialog-line.right {
+    flex-direction: row-reverse;
+    transform: translateX(20px);
+  }
+  .dialog-line.visible { opacity: 1; transform: translateX(0); }
+
+  .dialog-avatar { font-size: 2rem; flex-shrink: 0; }
+  .dialog-bubble {
+    background: white;
+    border-radius: 20px;
+    padding: 12px 18px;
+    max-width: 75%;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    position: relative;
+  }
+  .dialog-line.right .dialog-bubble { background: #e8f8f7; }
+  .dialog-speaker {
+    font-size: 0.75rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+    color: var(--coral);
+  }
+  .dialog-line.right .dialog-speaker { color: var(--teal); text-align: right; }
+  .dialog-text {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.5;
+  }
+
+  /* LESSON BOX */
+  .lesson-box {
+    background: linear-gradient(135deg, #fff9e6, #fff3cc);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 20px 0;
+    border-left: 6px solid var(--sun);
+    box-shadow: 0 4px 20px rgba(255,211,61,0.2);
+  }
+  .lesson-box h3 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #c17f00;
+    margin-bottom: 8px;
+  }
+  .lesson-box p { font-size: 1rem; font-weight: 700; color: #5a4000; line-height: 1.5; }
+
+  /* QUESTION BOX */
+  .question-box {
+    background: linear-gradient(135deg, #f0e6ff, #e6d0ff);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 15px 0;
+    border-left: 6px solid var(--purple);
+    box-shadow: 0 4px 20px rgba(199,125,255,0.2);
+  }
+  .question-box h3 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #7b2fff;
+    margin-bottom: 8px;
+  }
+  .question-box p { font-size: 1rem; font-weight: 700; color: #3d006e; }
+
+  /* CONTROLS */
+  .story-controls {
+    display: flex;
+    gap: 12px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 18px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-play {
+    background: linear-gradient(135deg, var(--grass), #4a9f5c);
+    color: white;
+    box-shadow: 0 6px 20px rgba(107,203,119,0.4);
+  }
+  .btn-play:hover { transform: translateY(-2px); }
+  .btn-new {
+    background: linear-gradient(135deg, var(--sky), #4a90d9);
+    color: white;
+    box-shadow: 0 6px 20px rgba(109,213,250,0.4);
+  }
+  .btn-new:hover { transform: translateY(-2px); }
+  .btn-back {
+    background: white;
+    color: var(--dark);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+  .btn-back:hover { transform: translateY(-2px); }
+
+  /* LOADING */
+  .loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: white;
+  }
+  .loading-dots {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .dot {
+    width: 16px; height: 16px;
+    background: white;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+    40% { transform: scale(1.2); opacity: 1; }
+  }
+  .loading p { font-size: 1.3rem; font-weight: 700; }
+
+  /* SPEAKING INDICATOR */
+  .speaking-indicator {
+    display: inline-flex;
+    gap: 3px;
+    align-items: center;
+    padding: 0 4px;
+  }
+  .speaking-indicator span {
+    width: 4px; height: 4px;
+    background: var(--grass);
+    border-radius: 50%;
+    animation: soundWave 0.8s infinite;
+  }
+  .speaking-indicator span:nth-child(2) { animation-delay: 0.2s; height: 8px; }
+  .speaking-indicator span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes soundWave {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(2); }
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin: 5px;
+  }
+
+  .divider {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    border-radius: 2px;
+    margin: 20px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="app">
+  <div class="header">
+    <h1>✨ Hikaye <span>Mühendisi</span> ✨</h1>
+    <p>Karakterleri seç, hikayeni yarat!</p>
+  </div>
+
+  <!-- SCREEN 1: AGE SELECTION -->
+  <div class="screen active" id="screen-age">
+    <p class="section-title">👶 Kaç yaşındaki arkadaşlar için? 👦</p>
+    <div class="age-cards">
+      <div class="age-card young" onclick="selectAge(34)">
+        <span class="emoji">🌱</span>
+        <h2>3-4 Yaş</h2>
+        <p>Kısa ve sevimli hikayeler</p>
+      </div>
+      <div class="age-card older" onclick="selectAge(56)">
+        <span class="emoji">🚀</span>
+        <h2>5-6 Yaş</h2>
+        <p>Daha uzun ve meraklı hikayeler</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: CHARACTER SELECTION -->
+  <div class="screen" id="screen-chars">
+    <p class="section-title">🎭 İki karakter seç!</p>
+
+    <div class="char-helper">
+      <div class="char-slot slot1">
+        <div class="dot"></div>
+        <span id="slot1-text">1. Karakter seçilmedi</span>
+      </div>
+      <div class="char-slot slot2">
+        <div class="dot"></div>
+        <span id="slot2-text">2. Karakter seçilmedi</span>
+      </div>
+    </div>
+
+    <p class="section-title" style="font-size:1.2rem;">🐾 Hayvanlar</p>
+    <div class="options-grid" id="animal-grid"></div>
+
+    <p class="section-title" style="font-size:1.2rem;">👨‍👩‍👧‍👦 İnsanlar</p>
+    <div class="options-grid" id="human-grid"></div>
+
+    <button class="btn-generate" id="btn-next-chars" disabled onclick="goToLocation()">
+      Mekan Seç! 🗺️
+    </button>
+  </div>
+
+  <!-- SCREEN 3: LOCATION & THEME -->
+  <div class="screen" id="screen-location">
+    <p class="section-title">🗺️ Nerede geçsin?</p>
+    <div class="location-grid" id="location-grid"></div>
+
+    <p class="section-title">💛 Hikayenin konusu ne olsun?</p>
+    <div class="theme-grid" id="theme-grid"></div>
+
+    <button class="btn-generate" id="btn-generate" disabled onclick="generateStory()">
+      🌟 Hikayemi Oluştur! 🌟
+    </button>
+  </div>
+
+  <!-- SCREEN 4: LOADING -->
+  <div class="screen" id="screen-loading">
+    <div class="loading">
+      <div style="font-size:5rem;">📖</div>
+      <p>Hikaye yazılıyor...</p>
+      <div class="loading-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <p style="opacity:0.7;font-size:0.95rem;">Karakterler hazırlanıyor ✨</p>
+    </div>
+  </div>
+
+  <!-- SCREEN 5: STORY -->
+  <div class="screen" id="screen-story">
+    <div class="story-bg" id="story-bg">
+      <div class="story-scene" id="story-scene"></div>
+      <div class="chars-display" id="chars-display"></div>
+      <div class="dialog-container" id="dialog-container"></div>
+      <div class="lesson-box" id="lesson-box"></div>
+      <div class="question-box" id="question-box"></div>
+    </div>
+
+    <div class="story-controls">
+      <button class="btn btn-play" id="btn-play" onclick="speakStory()">
+        🔊 Sesli Dinle
+      </button>
+      <button class="btn btn-new" onclick="goToChars()">
+        🎲 Yeni Hikaye
+      </button>
+      <button class="btn btn-back" onclick="goToAge()">
+        🏠 Başa Dön
+      </button>
+    </div>
+  </div>
+</div>
 
 <script>
-function baslat(){
-  let k = document.getElementById("karakter").value;
-  document.getElementById("hikaye").innerText =
-    k + " büyülü ormanda maceraya başladı...";
-}
-</script>
+// ============ DATA ============
+const animals = [
+  { id: 'cat', emoji: '🐱', label: 'Kedi', name: 'Pamuk' },
+  { id: 'bird', emoji: '🐦', label: 'Kuş', name: 'Cıvıl' },
+  { id: 'dino', emoji: '🦕', label: 'Dinozor', name: 'Dino' },
+  { id: 'dragon', emoji: '🐉', label: 'Ejderha', name: 'Kor' },
+  { id: 'dog', emoji: '🐶', label: 'Köpek', name: 'Pati' },
+  { id: 'fish', emoji: '🐟', label: 'Balık', name: 'Balcık' },
+  { id: 'horse', emoji: '🐴', label: 'At', name: 'Rüzgar' },
+];
+
+const humans = [
+  { id: 'mom', emoji: '👩', label: 'Anne', name: 'Anne' },
+  { id: 'dad', emoji: '👨', label: 'Baba', name: 'Baba' },
+  { id: 'girl', emoji: '👧', label: 'Kız Çocuk', name: 'Elif' },
+  { id: 'boy', emoji: '👦', label: 'Erkek Çocuk', name: 'Can' },
+  { id: 'baby', emoji: '👶', label: 'Bebek', name: 'Minik' },
+];
+
+const locations = [
+  { id: 'forest', emoji: '🌲', label: 'Orman', bg: 'linear-gradient(135deg, #134e5e, #71b280)' },
+  { id: 'home', emoji: '🏠', label: 'Ev', bg: 'linear-gradient(135deg, #f7971e, #ffd200)' },
+  { id: 'sea', emoji: '🌊', label: 'Deniz', bg: 'linear-gradient(135deg, #0052D4, #4364F7, #6FB1FC)' },
+  { id: 'space', emoji: '🚀', label: 'Uzay', bg: 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)' },
+  { id: 'farm', emoji: '🌾', label: 'Çiftlik', bg: 'linear-gradient(135deg, #56ab2f, #a8e063)' },
+];
+
+const themes = [
+  { id: 'empathy', emoji: '💛', label: 'Empati', desc: 'Kendini onun yerine koy' },
+  { id: 'sharing', emoji: '🤝', label: 'Paylaşmak', desc: 'Seninle paylaşmak isterim' },
+  { id: 'respect', emoji: '🙏', label: 'Saygı', desc: 'Büyüklere saygı' },
+  { id: 'help', emoji: '🫂', label: 'Yardımlaşma', desc: 'Birlikte daha güçlüyüz' },
+  { id: 'courage', emoji: '💪', label: 'Cesaret', desc: 'Korku olmaz, sen yaparsın' },
+  { id: 'responsibility', emoji: '🌱', label: 'Sorumluluk', desc: 'Bunu ben yapmalıyım' },
+];
+
+// ============ STATE ============
+let selectedAge = null;
+let selectedChars = [];
+let selectedLocation = null;
+let selectedTheme = null;
+let currentStory = null;
+let speechSynth = window.speechSynthesis;
+let isSpeaking = false;
+
+// ============ INIT ============
+function createStars() {
+  const container = document.getElementById('stars');
+  for (let i = 0; i < 50; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 4 + 1;
+    star.style.cssText = `
+      width: ${size}px; height: ${size}px;
+ 
